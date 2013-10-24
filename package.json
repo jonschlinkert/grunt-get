@@ -1,7 +1,7 @@
 {
   "name": "grunt-get",
   "description": "Download web pages or assets over HTTP requests.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/jonschlinkert/grunt-get",
   "author": {
     "name": "Jon Schlinkert",
@@ -21,10 +21,6 @@
     }
   ],
   "main": "tasks/components.js",
-  "dependencies": {
-    "cheerio": "~0.12.3",
-    "js-beautify": "~1.4.1"
-  },
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-jshint": "~0.6.4"

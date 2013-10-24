@@ -25,13 +25,12 @@ module.exports = function(grunt) {
 
   grunt.registerMultiTask('get', 'Download files.', function() {
     var done = this.async();
-
     var options = this.options();
 
     options.prepend = options.prepend || '';
     options.append  = options.append || '';
 
-    this.files.forEach(function(fp) {
+    async.forEach(this.files, function(fp, cb) {
 
       var cwd = fp.cwd || options.cwd || '';
       var ext = options.ext || ((fp.ext || fp.orig.ext) || path.extname(fp.src));
@@ -41,36 +40,42 @@ module.exports = function(grunt) {
         grunt.warn('Error: the "get" task requires file extension');
       }
 
-      function getPage(file, dest) {
-        file = '/' + path.join(cwd, path.basename(file)).replace(/\\/g, '/');
+      async.forEach(fp.orig.src, function (src, callback) {
 
-        var opts = {
-          host: options.host,
-          port: 80,
-          path: options.prepend + file + options.append + ext
-        };
-        var content = '';
+        function getPage(file, dest) {
+          file = '/' + path.join(cwd, path.basename(file)).replace(/\\/g, '/');
+          var opts = {
+            host: options.host,
+            port: 80,
+            path: options.prepend + file + options.append + ext
+          };
+          var content = '';
 
-        var req = http.request(opts, function(res) {
-          res.setEncoding('utf8');
-          res.on('data', function (chunk) {
-            content += chunk;
+          var req = http.request(opts, function(res) {
+            res.setEncoding('utf8');
+            res.on('data', function (chunk) {
+              content += chunk;
+            });
+            res.on('end', function () {
+              grunt.file.write(dest, content);
+              grunt.log.ok('Saved:'.yellow, path.join(fp.dest, file + ext).replace(/\\/g, '/'));
+              callback(null);
+            });
           });
-          res.on('end', function () {
-            grunt.file.write(dest, content);
-            grunt.log.ok('Saved:'.yellow, file + ext);
-          });
+          req.end();
+        }
+
+        grunt.file.expand({nonull: true}, src).map(function(file) {
+          var destPath = path.join(fp.dest, file + ext);
+          getPage(file, destPath);
         });
-        req.end();
-      }
 
-      grunt.file.expand({nonull: true}, fp.orig.src).map(function(file) {
-        var destPath = path.join(fp.dest, file + ext);
-        getPage(file, destPath);
+      }, function () {
+        cb(null);
       });
 
-      // Print a success message.
-      grunt.log.writeln('File "' + fp.dest + '" created.');
+    }, function () {
+      done();
     });
   });
 };
