@@ -32,19 +32,8 @@
   "keywords": [
     "gruntplugin",
     "grunt task",
-    "assemble",
-    "bootstrap",
-    "css",
-    "less",
-    "framework",
-    "library",
-    "components engineer",
-    "static site generator",
-    "yeoman static site generator",
-    "grunt static site generator",
-    "site generator",
-    "component generator",
-    "blog generator",
-    "templates"
+    "request",
+    "http",
+    "download"
   ]
 }
